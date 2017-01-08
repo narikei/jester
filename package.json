@@ -1,10 +1,11 @@
 {
   "name": "jester",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "hosts changer.",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-packager . Jester --platform=darwin --icon=jester.icns --overwrite"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,10 @@
   "author": "なりたけいすけ",
   "license": "ISC",
   "dependencies": {
-    "electron": "^1.4.13"
+    "electron": "^1.4.13",
+    "sudo-prompt": "^6.2.1"
+  },
+  "devDependencies": {
+    "electron-packager": "^8.4.0"
   }
 }

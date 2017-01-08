@@ -1,0 +1,32 @@
+<app>
+  <editor />
+
+  <script>
+    hostsfile.readFile((error, text) => {
+      if (error) {
+        alert(error);
+        return;
+      }
+
+      window.obs.trigger('showHosts', text);
+    });
+  </script>
+
+  <style>
+    app {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      background: #f3f3f3;
+    }
+
+    sidebar {
+      min-width: 150px;
+      width: 20%;
+    }
+
+    editor {
+      width: 100%;
+    }
+  </style>
+</app>

@@ -1,0 +1,151 @@
+<editor>
+  <div class="editor">
+    <ul class="line-numbers">
+      <li class="line-number" each="{line, i in hosts.list}" onclick="{lineSelect}">
+        {i}
+      </li>
+    </ul>
+    <ul class="lines" contenteditable="true" onkeypress="{editing}">
+      <li class="line" each="{hosts.list}">
+        <span if="{type === 'comment'}">
+          <span class="line-comment"> {comment}</span><br>
+        </span>
+        <span if="{type === 'host'}">
+          <span class="line-ip">{ip}</span>
+          <span class="line-spacer"> </span>
+          <span class="line-host">{host}</span>
+          <span if="{comment}">
+            <span class="line-spacer" if="{type !== 'comment'}"> </span>
+            <span class="line-comment"> {comment}</span><br>
+          </span>
+        </span>
+        <span if="{type === 'blank'}">
+          <br>
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="edited-mark" if="{!isEdited}"></div>
+  <div class="edited-mark isEdited" if="{isEdited}" onclick="{save}"></div>
+
+  <script>
+    const self = this;
+    self.isEdited = false;
+    self.hosts = {};
+
+    self.lineSelect = (e) => {
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+
+      const node = self.root.querySelector('.line:nth-child('+(e.item.i+1)+')');
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      selection.addRange(range);
+    };
+
+    self.editing = (e) => {
+      self.isEdited = true;
+      self.update();
+    };
+
+    self.save = () => {
+      ipcRenderer.send('save')
+    }
+
+    window.obs.on('showHosts', (text) => {
+      self.hosts = new Hosts(text);
+      self.update();
+    });
+
+    ipcRenderer.on('save', (event, tmpPath) => {
+      const text = self.root.querySelector('.lines').innerText;
+      const filepath = tmpPath + 'jester.' + new Date().getTime() + '-hosts'; 
+
+      hostsfile.writeFile(filepath, text, (error) => {
+        if (error) {
+          alert(error);
+          return;
+        }
+
+        self.isEdited = false;
+        self.update();
+      });
+
+      window.obs.trigger('showHosts', text);     
+    });
+
+    ipcRenderer.on('reformat', () => {
+      const text = self.root.querySelector('.lines').innerText;
+      window.obs.trigger('showHosts', text);
+    });
+  </script>
+
+  <style>
+    editor {
+      display: block;
+      overflow: scroll;
+    }
+    
+    .editor {
+      display: flex;
+      min-height: 100%;
+      font-size: 14px;
+      font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+      line-height: 1.6;
+    }
+
+    .line-numbers {
+      padding: 1ex 0;
+      text-align: right;
+      background: #333;
+    }
+
+    .line-number {
+      padding: 0 0.75em;
+      color: #ddd;
+      cursor: pointer;
+    }
+
+    .lines {
+      padding: 1ex 0;
+      width: 100%;
+      outline: none;
+    }
+
+    .line {
+      position: relative;
+      padding: 0 1em;
+    }
+
+    .line-ip {
+      color: #36c;
+    }
+
+    .line-host {
+      display: inline;
+    }
+
+    .line-comment {
+      color: #888;
+    }
+    
+    .line-spacer {
+      margin-left: 1em;
+    }
+
+    .edited-mark {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      width: 15px;
+      height: 15px;
+      border-radius: 6px;
+      background: #888;
+      cursor: pointer;
+    }
+    .edited-mark.isEdited {
+      background: #36c;
+    }
+  </style>
+</editor>
