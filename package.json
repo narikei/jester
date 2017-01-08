@@ -1,0 +1,22 @@
+{
+  "name": "jester",
+  "version": "1.0.0",
+  "description": "hosts changer.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:narikei/jester.git"
+  },
+  "keywords": [
+    "Electron",
+    "hosts"
+  ],
+  "author": "なりたけいすけ",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^1.4.13"
+  }
+}
